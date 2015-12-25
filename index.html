@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matching Game - Aplha</title>
+    <link rel="stylesheet" href="">
+</head>
+
+    <style>
+    
+        div {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+        }
+        
+        #rightSide {
+            border-left: 1px solid black;
+            left: 500px;
+        }
+        
+        img {
+            position:absolute;
+            width: 80px;
+            height: 80px;
+        }
+        
+    </style>    
+    
+<body>
+    <h2> Matching Game - Aplha</h2>
+    <p>Click on the extra Cow Face on both</p>
+  
+    <p>LEVEL: <span id="score"></span> | 
+       FACES: <span id="faces"></span> |
+       TIME:  <span id="time"></span>
+    </p>
+    
+    <div id="time"></div>
+    <div id="leftSide"></div>
+  
+    <div id="rightSide"></div>    
+    
+    <script>
+    
+        /*******************
+           Initializations
+        ********************/    
+        
+        var numberOfFaces = 3,
+            level = 1,
+            levelTime = 10;
+            theLeftSide = document.querySelector("#leftSide"),
+            theRightSide = document.querySelector("#rightSide"),
+            theScoreTab = document.querySelector("#score"),
+            theFacesTab = document.querySelector("#faces"),
+            theLevelTime = document.querySelector("#time"),
+            theBody = document.getElementsByTagName("body")[0],
+            faceUrl ="images/cow.png";
+        
+        
+        /*******************
+            Main Function
+        ********************/
+        
+        function generateFaces(){
+            
+            theScoreTab.innerHTML = level;
+            theFacesTab.innerHTML = numberOfFaces;
+            
+            
+            // create an img tag and load the face image
+            var setFace = document.createElement("img");
+            setFace.setAttribute('src',faceUrl);
+            setFace.style.top = setFacePosY() + 'px';
+            setFace.style.left = setFacePosX() + 'px';
+
+            // create the left side images
+            for(var i = 0; i < numberOfFaces; i++) {
+                var clonedFace = setFace.cloneNode(true);
+                clonedFace.style.top = setFacePosY() + 'px';
+                clonedFace.style.left = setFacePosX() + 'px';
+                theLeftSide.appendChild(clonedFace);
+           } 
+            
+            // copy whats on the left to the right side
+            var leftSideImages = theLeftSide.cloneNode(true);
+            leftSideImages.removeChild(leftSideImages.lastChild);
+            theRightSide.appendChild(leftSideImages);
+            
+            counter();
+            
+            // call next level function when is this clicked
+            theLeftSide.lastChild.addEventListener('click', nextLevel); 
+
+            // call the gameOver function
+            theBody.addEventListener('click', gameOver); 
+        }
+        
+        /*******************
+        Functional Functions
+        ********************/
+        
+        // set Random X Position
+        function setFacePosX(){
+            var posX = Math.random() * 400; 
+            Math.floor(posX);
+            return posX;
+        }
+        
+        // set Random Y Position
+        function setFacePosY(){
+            var posY = Math.random() * 400; 
+            Math.floor(posY);
+            return posY;
+        }
+        
+        // next level
+        function nextLevel(event){
+            event.stopPropagation();
+            clearTimeout(cto);
+            cleanBoards();
+            numberOfFaces += 3;    
+            console.log(numberOfFaces);
+            generateFaces();
+            level++;
+            levelTime += numberOfFaces;
+            theScoreTab.innerHTML = level;
+            theFacesTab.innerHTML = numberOfFaces;
+        }
+            
+        // game over
+        function gameOver() {
+            alert("LEVEL " + level + "\n\n" + "Game Over!" + 
+                  "\n\n" + "Thank you for playing!");
+            theBody.removeEventListener('click', gameOver);
+            theLeftSide.lastChild.removeEventListener('click', nextLevel);
+            clearTimeout(cto);
+            initGame();
+        } 
+        
+        function cleanBoards(){
+            while(theLeftSide.firstChild){
+                if(theRightSide.firstChild){
+                    theRightSide.removeChild(theRightSide.firstChild);
+                }
+                theLeftSide.removeChild(theLeftSide.firstChild);
+            }
+            
+        }
+        
+
+        function counter(){
+            levelTime--;
+            theLevelTime.innerHTML = levelTime;
+            cto = setTimeout(counter, 1000);
+            if (levelTime == 0)
+            gameOver();  
+        }
+        
+        function initGame(){
+            clearTimeout(cto);
+            numberOfFaces = 3;
+            level = 1;
+            levelTime = 10;
+            cleanBoards();
+            generateFaces();
+        }
+        
+        
+        // load the game
+        window.onload = generateFaces();
+        
+    </script>    
+</body>
+</html>
